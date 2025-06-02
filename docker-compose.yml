@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: sta_cruz_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: sta_cruz_db
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - sta_cruz_network
+    command: --default-authentication-plugin=mysql_native_password
+
+  # PHP Backend Service
+  php-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    container_name: sta_cruz_php
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./sta_cruz_prj:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - sta_cruz_network
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=sta_cruz_db
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+
+  # Vue Frontend Service
+  vue-frontend:
+    image: node:18-alpine
+    container_name: sta_cruz_vue
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./vue-project:/app
+      - /app/node_modules
+    depends_on:
+      - php-backend
+    networks:
+      - sta_cruz_network
+    command: >
+      sh -c "
+      npm install &&
+      npm run dev -- --host 0.0.0.0
+      "
+
+  # PHPMyAdmin for database management (optional)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: sta_cruz_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    depends_on:
+      - mysql
+    networks:
+      - sta_cruz_network
+
+networks:
+  sta_cruz_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
