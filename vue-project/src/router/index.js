@@ -8,6 +8,7 @@ import UserHomepage from '@/view/UserHomepage.vue'
 import UserManagement from '@/view/UserManagement.vue'
 import ResidentManagement from '@/view/ResidentManagement.vue'
 import GuestHomepage from '@/view/GuestHomepage.vue'
+import GuestEventsPage from '@/view/user/GuestEventsPage.vue'
 // Layouts
 import AdminLayout from '@/layout/AdminLayout.vue'
 import UserLayout from '@/layout/UserLayout.vue'
@@ -37,12 +38,12 @@ const routes = [
       { path: 'user-homepage', name: 'UserHomepage', component: UserHomepage },
     ]
   },
-
   {
     path: '/guest',
     component: GuestLayout,
     children:[
-      {path: 'guest-homepage', name: 'GuestHomepage', component: GuestHomepage}
+      {path: 'guest-homepage', name: 'GuestHomepage', component: GuestHomepage},
+      {path: 'events', name: 'GuestEventsPage', component: GuestEventsPage}
     ]
   },
 

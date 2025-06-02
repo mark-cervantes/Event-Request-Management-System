@@ -44,13 +44,10 @@ function logout() {
             </div>
         </div>
 
-        <v-divider class="my-3" />
-
-        <v-list nav dense class="ml-2 custom-font">
-            <v-list-item prepend-icon="mdi-home-outline" title="Home" :to="{ name: 'UserHomepage' }" />
-            <v-list-item prepend-icon="mdi-calendar" title="Event Scheduling"
-                :to="{ path: '/admin/event-scheduling' }" />
-            <v-list-item prepend-icon="mdi-message-alert" title="Complaints" :to="{ path: '/admin/complaints' }" />
+        <v-divider class="my-3" />        <v-list nav dense class="ml-2 custom-font">
+            <v-list-item prepend-icon="mdi-home-outline" title="Home" :to="{ name: 'GuestHomepage' }" />
+            <v-list-item prepend-icon="mdi-calendar" title="My Events" :to="{ name: 'GuestEventsPage' }" />
+            <v-list-item prepend-icon="mdi-message-alert" title="Complaints" :to="{ path: '/guest/complaints' }" />
         </v-list>
 
         <v-divider></v-divider>
