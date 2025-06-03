@@ -150,7 +150,6 @@ export default {
       currentUserId: 1, // TODO: Get from auth store/session
       
       tableHeaders: [
-        { title: 'ID', key: 'id', sortable: true, width: '80px' },
         { title: 'Event Name', key: 'event_name', sortable: true },
         { title: 'Facility', key: 'facility', sortable: true },
         { title: 'Start Date/Time', key: 'start_datetime', sortable: true },
