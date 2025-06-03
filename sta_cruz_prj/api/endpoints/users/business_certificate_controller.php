@@ -18,34 +18,8 @@ $db = $database->connect();
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'POST') {
-    // Handle file upload if present
-    $uploadDir = realpath(__DIR__ . '/../assets/certificates');
-    if ($uploadDir === false) {
-        $uploadDir = __DIR__ . '/../assets/certificates';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-    }
-
-    // If file is uploaded via multipart/form-data
-    if (isset($_FILES['path']) && $_FILES['path']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['path']['tmp_name'];
-        $fileName = basename($_FILES['path']['name']);
-        $fileName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $fileName);
-        $destPath = $uploadDir . DIRECTORY_SEPARATOR . $fileName;
-
-        if (move_uploaded_file($fileTmpPath, $destPath)) {
-            $savedPath = "assets/certificates/{$fileName}";
-        } else {
-            echo json_encode(['message' => 'Failed to save uploaded file']);
-            exit;
-        }
-        // Use $_POST for other fields
-        $data = $_POST;
-        $data['path'] = $savedPath;
-    } else {
-        $data = json_decode(file_get_contents("php://input"), true);
-    }
+    // Handle JSON data with base64 images
+    $data = json_decode(file_get_contents("php://input"), true);
 
     if (!isset($data['action'])) {
         echo json_encode(['message' => 'No action specified']);
@@ -63,7 +37,6 @@ if ($method === 'POST') {
             isset($data['business_address']) &&
             isset($data['date_registered']) &&
             isset($data['issued_date']) &&
-            isset($data['path']) &&
             isset($data['expiry_date']) &&
             isset($data['business_owner'])
         ) {
@@ -71,20 +44,30 @@ if ($method === 'POST') {
             $status = (strtolower($data['status']) === 'approved') ? 1 : 0;
     
             $query = "INSERT INTO business_certificate 
-                (business_type, status, business_name, business_address, date_registered, issued_date, path, expiry_date, business_owner)
+                (business_type, status, business_name, business_address, date_registered, issued_date, image_data, expiry_date, business_owner)
                 VALUES
-                (:business_type, :status, :business_name, :business_address, :date_registered, :issued_date, :path, :expiry_date, :business_owner)";
+                (:business_type, :status, :business_name, :business_address, :date_registered, :issued_date, :image_data, :expiry_date, :business_owner)";
             $stmt = $db->prepare($query);
     
-            $stmt->bindParam(':business_type', $data['business_type']);
+            // Assign variables for bindParam (requires references)
+            $business_type = $data['business_type'];
+            $business_name = $data['business_name'];
+            $business_address = $data['business_address'];
+            $date_registered = $data['date_registered'];
+            $issued_date = $data['issued_date'];
+            $image_data = $data['image_data'] ?? null;
+            $expiry_date = $data['expiry_date'];
+            $business_owner = $data['business_owner'];
+            
+            $stmt->bindParam(':business_type', $business_type);
             $stmt->bindParam(':status', $status, PDO::PARAM_INT);
-            $stmt->bindParam(':business_name', $data['business_name']);
-            $stmt->bindParam(':business_address', $data['business_address']);
-            $stmt->bindParam(':date_registered', $data['date_registered']);
-            $stmt->bindParam(':issued_date', $data['issued_date']);
-            $stmt->bindParam(':path', $data['path']);
-            $stmt->bindParam(':expiry_date', $data['expiry_date']);
-            $stmt->bindParam(':business_owner', $data['business_owner']);
+            $stmt->bindParam(':business_name', $business_name);
+            $stmt->bindParam(':business_address', $business_address);
+            $stmt->bindParam(':date_registered', $date_registered);
+            $stmt->bindParam(':issued_date', $issued_date);
+            $stmt->bindParam(':image_data', $image_data);
+            $stmt->bindParam(':expiry_date', $expiry_date);
+            $stmt->bindParam(':business_owner', $business_owner);
     
             if ($stmt->execute()) {
                 echo json_encode(['message' => 'Business certificate added']);
@@ -105,7 +88,7 @@ if ($method === 'POST') {
         $fields = [];
         $params = [':id' => $id];
     
-        foreach (['business_type', 'status', 'business_name', 'business_address', 'date_registered', 'issued_date', 'path', 'expiry_date', 'business_owner'] as $field) {
+        foreach (['business_type', 'status', 'business_name', 'business_address', 'date_registered', 'issued_date', 'image_data', 'expiry_date', 'business_owner'] as $field) {
             if (isset($data[$field])) {
                 if ($field === 'status') {
                     // Convert status to integer: 1 for 'Approved', 0 otherwise
@@ -149,7 +132,7 @@ if ($method === 'POST') {
         exit;
     }
 
-    echo json_encode(['message' => 'Invalid action or missing parameters', 'action' => $action]);   
+    echo json_encode(['message' => 'Invalid action or missing parameters', 'action' => $action]);
     exit;
  
 }
@@ -173,19 +156,17 @@ if ($num > 0) {
     $cert_arr['data'] = [];
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        extract($row);
-
         $cert_item = array(
-            'business_certificate_id' => $business_certificate_id,
-            'business_type' => $business_type,
-            'status' => $status,
-            'business_name' => $business_name,
-            'business_address' => $business_address,
-            'date_registered' => $date_registered,
-            'issued_date' => $issued_date,
-            'path' => $path,
-            'expiry_date' => $expiry_date,
-            'business_owner' => $business_owner
+            'business_certificate_id' => $row['business_certificate_id'],
+            'business_type' => $row['business_type'],
+            'status' => $row['status'],
+            'business_name' => $row['business_name'],
+            'business_address' => $row['business_address'],
+            'date_registered' => $row['date_registered'],
+            'issued_date' => $row['issued_date'],
+            'image_data' => $row['image_data'],
+            'expiry_date' => $row['expiry_date'],
+            'business_owner' => $row['business_owner']
         );
 
         array_push($cert_arr['data'], $cert_item);

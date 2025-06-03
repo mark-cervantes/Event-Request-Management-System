@@ -116,7 +116,7 @@ INSERT INTO reservations (user_id, official_id, facility, event_name, start_date
 (8, 3, 'Covered Court', 'Community Sports Day', '2025-06-20 07:00:00', '2025-06-20 17:00:00', 'Pending', 'Rosa Lopez', '09890123456', 'Annual community sports and recreation event', 150),
 (2, 1, 'Auditorium', 'Health Seminar', '2025-06-25 13:00:00', '2025-06-25 17:00:00', 'Approved', 'Dr. Maria Santos', '09234567890', 'Public health awareness seminar', 100);
 
--- 5. Create business_certificate table (CORRECTED with proper constraints)
+-- 5. Create business_certificate table (UPDATED to store images in database)
 CREATE TABLE IF NOT EXISTS `business_certificate` (
   `business_certificate_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `business_type` varchar(100) DEFAULT NULL,
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `business_certificate` (
   `business_address` varchar(255) DEFAULT NULL,
   `date_registered` date DEFAULT NULL,
   `issued_date` date DEFAULT NULL,
-  `path` varchar(255) DEFAULT NULL,
+  `image_data` LONGTEXT DEFAULT NULL COMMENT 'Base64 encoded payment receipt image',
   `expiry_date` date DEFAULT NULL,
   `business_owner` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`business_certificate_id`),
@@ -133,10 +133,10 @@ CREATE TABLE IF NOT EXISTS `business_certificate` (
   CONSTRAINT `fk_business_owner` FOREIGN KEY (`business_owner`) REFERENCES `resident` (`resident_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insert sample data for business_certificate (PRESERVED original data)
-INSERT INTO `business_certificate` (`business_certificate_id`, `business_type`, `status`, `business_name`, `business_address`, `date_registered`, `issued_date`, `path`, `expiry_date`, `business_owner`) VALUES
-(2, 'Retail', 0, 'S', 'A', '2024-05-01', '2024-05-02', 'assets/certiifcates/6839176bc5322_t.png', '2025-05-01', 7),
-(3, 'Retail', 1, 'ABC Store', '123 Main Street, Springfield', '2024-05-01', '2024-05-02', 'assets/certificates/68391825b9a54_t.png', '2025-05-31', 3);
+-- Insert sample data for business_certificate (UPDATED to remove path references)
+INSERT INTO `business_certificate` (`business_certificate_id`, `business_type`, `status`, `business_name`, `business_address`, `date_registered`, `issued_date`, `image_data`, `expiry_date`, `business_owner`) VALUES
+(2, 'Retail', 0, 'S', 'A', '2024-05-01', '2024-05-02', NULL, '2025-05-01', 7),
+(3, 'Retail', 1, 'ABC Store', '123 Main Street, Springfield', '2024-05-01', '2024-05-02', NULL, '2025-05-31', 3);
 
 -- 6. Create complaint_form table (CORRECTED with proper constraints)
 CREATE TABLE IF NOT EXISTS `complaint_form` (
