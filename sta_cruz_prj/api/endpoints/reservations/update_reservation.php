@@ -2,10 +2,10 @@
 // api/endpoints/update_reservation.php
 
 // Include centralized CORS configuration
-include_once '../config/cors.php';
+include_once '../../config/cors.php';
 
-include_once '../config/database.php';
-include_once '../models/reservation.php';
+include_once '../../config/database.php';
+include_once '../../models/reservation.php';
 
 $database = new Database();
 $db = $database->connect();

@@ -2,10 +2,10 @@
 // api/endpoints/create_singleReservation.php
 
 // Include centralized CORS configuration
-include_once '../config/cors.php';
+include_once '../../config/cors.php';
 
-include_once '../config/database.php';
-include_once '../models/reservation.php';
+include_once '../../config/database.php';
+include_once '../../models/reservation.php';
 
 // Instantiate DB & connect
 $database = new Database();
@@ -16,6 +16,7 @@ $reservation = new Reservation($db);
 
 // Get raw posted data
 $data = json_decode(file_get_contents("php://input"));
+
 
 // Basic validation for required fields
 if (
