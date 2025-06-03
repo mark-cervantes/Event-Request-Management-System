@@ -253,7 +253,7 @@
               <v-btn color="primary" text @click="handleSubmitAnother">
                 Submit Another
               </v-btn>
-              <v-btn color="secondary" text @click="() => { showSuccessDialog = false; router.push('/AdminComplaint') }">
+              <v-btn color="secondary" text @click="() => { showSuccessDialog = false; router.push('/user/user-homepage') }">
                 Go to Home
               </v-btn>
             </v-card-actions>
