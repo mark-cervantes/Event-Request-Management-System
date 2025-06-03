@@ -88,29 +88,31 @@ async function addCertificate() {
       status: Status.value === 'Approved' ? 1 : 0
     };
 
+    // Convert file to base64 if present
     if (Certificate_Path.value) {
-      const formData = new FormData();
-      formData.append('path', Certificate_Path.value);
-      
-      // Append all payload fields
-      Object.keys(payload).forEach(key => {
-        formData.append(key, payload[key]);
-      });
-
-      console.log('Submitting form data:', Object.fromEntries(formData)); // Debug log
-
-      const response = await axios.post(url, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      if (response.data && response.data.message) {
-        alert(response.data.message);
-        dialog.value = false;
-        await fetchbusinesslist(); // Refresh the data instead of reloading page
+      const file = Array.isArray(Certificate_Path.value) ? Certificate_Path.value[0] : Certificate_Path.value;
+      if (file) {
+        try {
+          const base64 = await convertFileToBase64(file);
+          payload.image_data = base64;
+        } catch (error) {
+          console.error('Error converting file to base64:', error);
+          alert('Error processing image file. Please try again.');
+          return;
+        }
       }
-    } else {
-      alert('Please upload a payment receipt');
-      return;
+    }
+
+    console.log('Submitting payload:', payload); // Debug log
+
+    const response = await axios.post(url, payload, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (response.data && response.data.message) {
+      alert(response.data.message);
+      dialog.value = false;
+      await fetchbusinesslist(); // Refresh the data instead of reloading page
     }
   } catch (error) {
     console.error('Error submitting form:', error);
@@ -118,16 +120,14 @@ async function addCertificate() {
   }
 }
 
-function handleFileUpload(file) {
-  console.log('File upload event:', file); // Debug log
-  
-  if (!file) {
-    Certificate_Path.value = null;
-    return;
-  }
-
-  // v-file-input emits the file directly
-  Certificate_Path.value = file;
+// Helper function to convert file to base64
+function convertFileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
 }
 
 async function editClicked(id) {
@@ -201,18 +201,23 @@ function filterTable() {
     (row.date_registered && row.date_registered.toLowerCase().includes(q)) ||
     (row.issued_date && row.issued_date.toLowerCase().includes(q)) ||
     (row.expiry_date && row.expiry_date.toLowerCase().includes(q)) ||
-    (row.status !== undefined && (row.status == 1 ? 'approved' : 'pending').includes(q)) ||
-    (row.path && row.path.toLowerCase().includes(q))
+    (row.status !== undefined && (row.status == 1 ? 'approved' : 'pending').includes(q))
   );
 }
 
 watch([allData, search], filterTable);
 
-function viewReceipt(path) {
-  if (path && path.trim() !== '') {
-    // Ensure the path is properly formatted
-    const fullPath = path.startsWith('http') ? path : apiUrl + 'api/endpoints/' + path;
-    currentReceipt.value = fullPath;
+function viewReceipt(imageData) {
+  if (imageData && imageData.trim() !== '') {
+    // If it's base64 data, use it directly; otherwise try to construct URL
+    const isBase64 = imageData.startsWith('data:');
+    if (isBase64) {
+      currentReceipt.value = imageData;
+    } else {
+      // Fallback for old file paths
+      const fullPath = imageData.startsWith('http') ? imageData : apiUrl + 'api/endpoints/' + imageData;
+      currentReceipt.value = fullPath;
+    }
     receiptDialog.value = true;
   }
 }
@@ -288,7 +293,6 @@ onMounted(() => {
           prepend-icon="mdi-upload"
           show-size
           accept="image/*"
-          @change="handleFileUpload"
           :disabled="false"
         />
         </template>
@@ -299,7 +303,6 @@ onMounted(() => {
     prepend-icon="mdi-upload"
     show-size
     accept="image/*"
-    @change="handleFileUpload"
   />
   <!-- Show payment instruction below the file input -->
   <div class="text-caption mt-1">
@@ -386,10 +389,10 @@ onMounted(() => {
         </td>
         <td>
             <v-btn
-              v-if="row.path && row.path.trim() !== ''"
+              v-if="row.image_data && row.image_data.trim() !== ''"
               text
               color="primary"
-              @click="viewReceipt(row.path)"
+              @click="viewReceipt(row.image_data)"
             >
               View
             </v-btn>
