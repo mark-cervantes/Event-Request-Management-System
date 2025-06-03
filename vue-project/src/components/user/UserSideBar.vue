@@ -53,7 +53,7 @@ function logout() {
                 :to="{ path: '/user/business-clearance' }" />
             <v-list-item prepend-icon="mdi-calendar" title="Event Scheduling"
                 :to="{ path: '/user/event-scheduling' }" />
-            <v-list-item prepend-icon="mdi-message-alert" title="Complaints" :to="{ path: '/user/complaints' }" />
+            <v-list-item prepend-icon="mdi-message-alert" title="Complaints" :to="{ path: '/user/complaint-form' }" />
         </v-list>
 
         <v-divider></v-divider>
