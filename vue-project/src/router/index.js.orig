@@ -27,8 +27,7 @@ const routes = [
     path: '/admin',
     component: AdminLayout,
     children: [
-      { path: 'dashboard', name: 'AdminDashboard', component: AdminDashboard },
-      { path: 'user-management', name: 'UserManagement', component: UserManagement },
+      { path: 'dashboard', name: 'AdminDashboard', component: AdminDashboard },      { path: 'user-management', name: 'UserManagement', component: UserManagement },
       { path: 'resident-management', name: 'ResidentManagement', component: ResidentManagement },
       { path: 'record-complaint', name: 'RecordComplaint', component: RecordComplaint },
       { path: 'events-table', name: 'EventsTable', component: EventsTable },

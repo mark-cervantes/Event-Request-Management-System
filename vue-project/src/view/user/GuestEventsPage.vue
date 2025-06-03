@@ -126,6 +126,7 @@ import DataTable from '@/components/common/Table.vue'
 import GuestEventFormModal from '@/components/event/GuestEventFormModal.vue'
 import GuestEventViewModal from '@/components/event/GuestEventViewModal.vue'
 import { apiConfig } from '@/config/api.js'
+import { buildApiUrl } from '@/utils/api'
 
 export default {
   name: 'GuestEventsPage',
@@ -183,7 +184,7 @@ export default {
     async loadEvents() {
       this.loading = true
       try {
-        const response = await axios.get(`${this.apiBaseUrl}/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`)
+        const response = await axios.get(buildApiUrl(`/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`))
         this.events = response.data.data || []
       } catch (error) {
         console.error('Error loading events:', error)
@@ -202,7 +203,7 @@ export default {
 
       this.loading = true
       try {
-        const response = await axios.get(`${this.apiBaseUrl}/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`)
+        const response = await axios.get(buildApiUrl(`/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`))
         const allEvents = response.data.data || []
         
         // Filter events locally by search keywords
@@ -228,7 +229,7 @@ export default {
 
       this.loading = true
       try {
-        const response = await axios.get(`${this.apiBaseUrl}/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`)
+        const response = await axios.get(buildApiUrl(`/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`))
         const allEvents = response.data.data || []
         
         // Filter events locally by facility

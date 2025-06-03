@@ -158,7 +158,6 @@ import DataTable from '@/components/common/Table.vue'
 import EventFormModal from '@/components/event/EventFormModal.vue'
 import EventViewModal from '@/components/event/EventViewModal.vue'
 import { apiConfig } from '@/config/api.js'
-import { buildApiUrl } from '@/utils/api'
 
 export default {
   name: 'EventsTable',
@@ -228,7 +227,7 @@ export default {
     async loadEvents() {
       this.loading = true
       try {
-        const response = await axios.get(buildApiUrl(`/reservations/readReservation.php`))
+        const response = await axios.get(`${this.apiBaseUrl}/readReservation.php`)
         this.events = response.data.data || []
       } catch (error) {
         console.error('Error loading events:', error)
@@ -246,7 +245,7 @@ export default {
 
       this.loading = true
       try {
-        const response = await axios.get(buildApiUrl(`/reservations/search_reservations.php?keywords=${encodeURIComponent(this.searchKeywords)}`))
+        const response = await axios.get(`${this.apiBaseUrl}/search_reservations.php?keywords=${encodeURIComponent(this.searchKeywords)}`)
         this.events = response.data.data || []
       } catch (error) {
         console.error('Error searching events:', error)
@@ -264,7 +263,7 @@ export default {
 
       this.loading = true
       try {
-        const response = await axios.get(buildApiUrl(`/reservations/read_reservations_by_status.php?status=${this.statusFilter}`))
+        const response = await axios.get(`${this.apiBaseUrl}/read_reservations_by_status.php?status=${this.statusFilter}`)
         this.events = response.data.data || []
       } catch (error) {
         console.error('Error filtering by status:', error)
@@ -282,7 +281,7 @@ export default {
 
       this.loading = true
       try {
-        const response = await axios.get(buildApiUrl(`/reservations/read_reservations_by_facility.php?facility=${encodeURIComponent(this.facilityFilter)}`))
+        const response = await axios.get(`${this.apiBaseUrl}/read_reservations_by_facility.php?facility=${encodeURIComponent(this.facilityFilter)}`)
         this.events = response.data.data || []
       } catch (error) {
         console.error('Error filtering by facility:', error)
@@ -326,10 +325,10 @@ export default {
       this.loading = true
       try {
         if (this.isEditing) {
-          await axios.put(`${this.apiBaseUrl}/reservations/update_reservation.php`, eventData)
+          await axios.put(`${this.apiBaseUrl}/update_reservation.php`, eventData)
           this.$toast?.success?.('Event updated successfully')
         } else {
-          await axios.post(`${this.apiBaseUrl}/reservations/create_singleReservation.php`, eventData)
+          await axios.post(`${this.apiBaseUrl}/create_singleReservation.php`, eventData)
           this.$toast?.success?.('Event created successfully')
         }
         this.showFormModal = false
@@ -352,7 +351,7 @@ export default {
       this.showDeleteDialog = false
       this.loading = true
       try {
-        await axios.delete(`${this.apiBaseUrl}/reservations/delete_reservation.php`, {
+        await axios.delete(`${this.apiBaseUrl}/delete_reservation.php`, {
           data: { id: this.deleteEventId }
         })
         this.$toast?.success?.('Event deleted successfully')

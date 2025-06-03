@@ -9,5 +9,12 @@ if (import.meta.env.VITE_API_BASE_URL) {
 
 // Helper function to build API endpoints
 export const buildApiUrl = (endpoint) => {
+  // Ensure the endpoint does not start with a slash
+  if (endpoint.startsWith('/')) {
+    endpoint = endpoint.substring(1);
+  }
+  // sanitize the endpoint to prevent double slashes
+  endpoint = endpoint.replace(/\/{2,}/g, '/');
+  // Return the full API URL
   return `${API_BASE_URL}/${endpoint}`;
 };
