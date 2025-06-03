@@ -121,6 +121,7 @@ class Reservation {
         $stmt->bindParam(':expected_attendees', $this->expected_attendees);
 
         if ($stmt->execute()) {
+            $this->id = $this->conn->lastInsertId();
             return true;
         }
 

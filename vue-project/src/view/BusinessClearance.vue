@@ -200,8 +200,7 @@ async function editClicked(id) {
 async function deleteClicked(id) {
   if (confirm("Do you want to delete this Business Clearance?")) {
     try {
-      const baseURL = import.meta.env.VITE_API_URL;
-      const url = baseURL + '/users/business_certificate_controller.php';
+      const url = buildApiUrl('/users/business_certificate_controller.php');
       const payload = { action: 'delete', id };
       const response = await axios.post(url, payload);
       alert(response.data.message);

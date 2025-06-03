@@ -616,7 +616,7 @@ import { buildApiUrl } from '@/utils/api'
       // Do NOT include submitted_date or other readonly fields if your API forbids updating them
       }
 
-      const response = await fetch('http://localhost/sta_cruz_prj/api/endpoints/complaints/update_complaints.php', {
+      const response = await fetch(buildApiUrl('/complaints/update_complaints.php'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -792,7 +792,7 @@ import { buildApiUrl } from '@/utils/api'
     if (!deletingItem.value) return; // Exit if no item selected to delete
 
     try {
-      const response = await fetch('http://localhost/sta_cruz_prj/api/endpoints/complaints/delete_complaint.php', {
+      const response = await fetch(buildApiUrl('/complaints/delete_complaint.php'), {
         method: 'POST', // or 'DELETE' if your API supports it
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ brngy_case_no: deletingItem.value.brngy_case_no }),

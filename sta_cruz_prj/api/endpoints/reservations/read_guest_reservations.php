@@ -6,7 +6,7 @@ include_once '../../config/database.php';
 include_once '../../models/reservation.php';
 
 $database = new Database();
-$db = $database->getConnection();
+$db = $database->connect();
 
 $reservation = new Reservation($db);
 

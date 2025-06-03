@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .response { margin-top: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Guest Reservation API Test</h1>
+        
+        <form id="reservationForm">
+            <div class="form-group">
+                <label for="event_name">Event Name (Required):</label>
+                <input type="text" id="event_name" name="event_name" value="Community Meeting" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="facility">Facility (Required):</label>
+                <select id="facility" name="facility" required>
+                    <option value="">Select a facility</option>
+                    <option value="Barangay Hall">Barangay Hall</option>
+                    <option value="Basketball Court">Basketball Court</option>
+                    <option value="Covered Court">Covered Court</option>
+                    <option value="Multi-purpose Area">Multi-purpose Area</option>
+                    <option value="Auditorium">Auditorium</option>
+                    <option value="Meeting Room 1">Meeting Room 1</option>
+                    <option value="Meeting Room 2">Meeting Room 2</option>
+                    <option value="Training Room A">Training Room A</option>
+                    <option value="Executive Boardroom">Executive Boardroom</option>
+                    <option value="Conference Room A">Conference Room A</option>
+                    <option value="Conference Room B">Conference Room B</option>
+                    <option value="Conference Room C">Conference Room C</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="start_datetime">Start Date & Time (Required):</label>
+                <input type="datetime-local" id="start_datetime" name="start_datetime" value="2025-06-10T14:00" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="end_datetime">End Date & Time (Required):</label>
+                <input type="datetime-local" id="end_datetime" name="end_datetime" value="2025-06-10T16:00" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="requested_by">Requested By (Required):</label>
+                <input type="text" id="requested_by" name="requested_by" value="John Doe" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact_number">Contact Number (Required):</label>
+                <input type="tel" id="contact_number" name="contact_number" value="09123456789" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="purpose">Purpose (Optional):</label>
+                <textarea id="purpose" name="purpose" rows="3">Community discussion and planning session</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="expected_attendees">Expected Attendees (Optional):</label>
+                <input type="number" id="expected_attendees" name="expected_attendees" value="25" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="user_id">User ID (Optional):</label>
+                <input type="number" id="user_id" name="user_id" value="" placeholder="Leave empty for guest reservation">
+            </div>
+            
+            <button type="submit">Test Original API</button>
+            <button type="button" onclick="testDebugAPI()">Test Debug API</button>
+        </form>
+        
+        <div id="response" class="response" style="display: none;"></div>
+    </div>
+
+    <script>
+        document.getElementById('reservationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            testAPI('api/endpoints/reservations/create_guest_reservation.php');
+        });
+
+        function testDebugAPI() {
+            testAPI('api/endpoints/reservations/debug_guest_reservation.php');
+        }
+
+        function testAPI(endpoint) {
+            const form = document.getElementById('reservationForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (value !== '') {
+                    data[key] = value;
+                }
+            }
+            
+            // Convert datetime-local format to MySQL datetime format
+            if (data.start_datetime) {
+                data.start_datetime = data.start_datetime.replace('T', ' ') + ':00';
+            }
+            if (data.end_datetime) {
+                data.end_datetime = data.end_datetime.replace('T', ' ') + ':00';
+            }
+            
+            // Convert user_id and expected_attendees to numbers if they exist
+            if (data.user_id) {
+                data.user_id = parseInt(data.user_id);
+            }
+            if (data.expected_attendees) {
+                data.expected_attendees = parseInt(data.expected_attendees);
+            }
+            
+            console.log('Sending data:', data);
+            
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                return response.json().then(data => ({
+                    status: response.status,
+                    data: data
+                }));
+            })
+            .then(result => {
+                const responseDiv = document.getElementById('response');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response ' + (result.data.success ? 'success' : 'error');
+                responseDiv.innerHTML = `
+                    <h3>Response (Status: ${result.status})</h3>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            })
+            .catch(error => {
+                const responseDiv = document.getElementById('response');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.innerHTML = `
+                    <h3>Error</h3>
+                    <pre>${error.message}</pre>
+                `;
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

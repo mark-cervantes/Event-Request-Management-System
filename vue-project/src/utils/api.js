@@ -16,5 +16,6 @@ export const buildApiUrl = (endpoint) => {
   // sanitize the endpoint to prevent double slashes
   endpoint = endpoint.replace(/\/{2,}/g, '/');
   // Return the full API URL
+  console.info(`${API_BASE_URL}/${endpoint}`)
   return `${API_BASE_URL}/${endpoint}`;
 };

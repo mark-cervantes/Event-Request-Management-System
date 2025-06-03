@@ -11,7 +11,7 @@ import GuestHomepage from '@/view/GuestHomepage.vue'
 import RecordComplaint from '@/view/RecordComplaint.vue'
 import ComplaintForm from '@/view/ComplaintForm.vue'
 import EventsTable from '@/view/EventsTable.vue'
-import GuestEventsPage from '@/view/user/GuestEventsPage.vue'
+import GuestEventsPage from '@/view/user/UserEventsPage.vue'
 import BusinessClearance from '@/view/BusinessClearance.vue'
 // Layouts
 import AdminLayout from '@/layout/AdminLayout.vue'
@@ -44,7 +44,8 @@ const routes = [
     component: UserLayout,
     children: [
       { path: 'user-homepage', name: 'UserHomepage', component: UserHomepage },
-      { path: 'complaint-form', name: 'ComplaintForm', component: ComplaintForm }
+      { path: 'complaint-form', name: 'ComplaintForm', component: ComplaintForm },
+      { path: 'event-scheduling', name: 'UserEventsForm', component: GuestEventsPage }
     ]
   },
 

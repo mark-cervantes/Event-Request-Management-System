@@ -283,11 +283,11 @@ export default {
       try {
         if (this.isEditing) {
           // Use the guest-specific update endpoint that only allows certain fields
-          await axios.put(`${this.apiBaseUrl}/reservations/update_guest_reservation.php`, eventData)
+          await axios.put(buildApiUrl(`/reservations/update_guest_reservation.php`, eventData))
           this.$toast?.success?.('Event updated successfully')
         } else {
           // Use the guest-specific creation endpoint
-          await axios.post(`${this.apiBaseUrl}/reservations/create_guest_reservation.php`, eventData)
+          await axios.post(buildApiUrl(`/reservations/create_guest_reservation.php`, eventData))
           this.$toast?.success?.('Event request submitted successfully')
         }
         this.showFormModal = false
