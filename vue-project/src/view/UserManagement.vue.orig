@@ -102,24 +102,22 @@ async function saveUser() {
         ? buildApiUrl('users/update_users.php')
         : buildApiUrl('users/create_users.php');
 
-        try {
-            const { data } = await axios.post(url, form.value);
-            alert(data.message);
-            fetchUsers(); // Refresh the user list
-            dialog.value = false; // Only close the dialog on successful save
-        } catch (err) {
-            console.error('Save error:', err.response ? err.response.data : err.message);
-            alert('Error saving user: ' + (err.response ? err.response.data.message : err.message));
-        }
+    try {
+        const { data } = await axios.post(url, form.value);
+        alert(data.message);
+        fetchUsers(); // Refresh the user list
+        dialog.value = false; // Only close the dialog on successful save
+    } catch (err) {
+        console.error('Save error:', err.response ? err.response.data : err.message);
+        alert('Error saving user: ' + (err.response ? err.response.data.message : err.message));
     }
+}
 
 
     async function archiveUser(user_id) {
         console.log("Archiving user with ID:", user_id); // ← Add this line
-        if (!confirm('Do you want to archive this user?')) return;
-
-        try {
-            const { data } = await axios.post('http://localhost/sta_cruz_prj/api/endpoints/users/archive_users.php', {
+        if (!confirm('Do you want to archive this user?')) return;        try {
+            const { data } = await axios.post(buildApiUrl('users/archive_users.php'), {
                 user_id
             });
             alert(data.message);
@@ -195,10 +193,9 @@ async function saveUser() {
     <template>
         <v-container fluid class="pa-4 mt-1">
             <v-btn-toggle v-model="tableViewRole" mandatory>
-                <v-btn value="user">User</v-btn>
-                <v-btn value="official">Official</v-btn>
                 <v-btn value="admin">Admin</v-btn>
-
+                <v-btn value="official">Official</v-btn>
+                <v-btn value="user">User</v-btn>
             </v-btn-toggle>
 
 
@@ -218,17 +215,16 @@ async function saveUser() {
                     </v-col>
 
                 </v-row>
+        
 
-
-                <v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" clearable
-                    class="bg-white" />
-                <v-row>
-                    <v-col>
-                        <v-btn-toggle v-model="viewMode" mandatory>
-                            <v-btn value="residents">Active/Inactive</v-btn>
-                            <v-btn value="archived">Archived</v-btn>
-                        </v-btn-toggle>
-                    </v-col>
+                <v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" clearable class="bg-white" />
+            <v-row>
+                <v-col>
+                    <v-btn-toggle v-model="viewMode" mandatory>
+                        <v-btn value="residents" >Active/Inactive</v-btn>
+                        <v-btn value="archived" >Archived</v-btn>
+                    </v-btn-toggle>
+                </v-col>
                 </v-row>
 
                 <!-- your <v-row> of selects here -->
@@ -265,7 +261,7 @@ async function saveUser() {
 
                             <v-select v-model="form.status" :items="['active', 'inactive']" label="Status"
                                 :rules="[rules.required]" />
-                            <v-autocomplete v-model="form.resident_id" :items="residents" item-value="resident_id"
+                            <v-autocomplete v-model="form.resident_id"  :items="residents" item-value="resident_id"
                                 :item-title="item => `${item.resident_id || 'Resident Number'} - ${item.full_name || 'Full Name'}`"
                                 label="Select Resident" :rules="[rules.required]" dense clearable />
 
@@ -394,7 +390,7 @@ async function saveUser() {
                             }}
                         </td>
                         <td>{{ user.status }}</td>
-
+                    
                         <td>{{ user.created_at }}</td>
                         <td>{{ user.updated_at }}</td>
                         <td>

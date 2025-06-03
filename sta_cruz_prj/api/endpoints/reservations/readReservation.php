@@ -2,10 +2,10 @@
 // api/endpoints/readReservation.php
 
 // Include centralized CORS configuration
-include_once '../config/cors.php';
+include_once '../../config/cors.php';
 
-include_once '../config/database.php';
-include_once '../models/reservation.php';
+include_once '../../config/database.php';
+include_once '../../models/reservation.php';
 
 // Instantiate database
 $database = new Database();
@@ -56,4 +56,3 @@ if ($num > 0) {
     // No reservations found
     echo json_encode(array('message' => 'No reservations found'));
 }
-?>

@@ -126,6 +126,7 @@ import DataTable from '@/components/common/Table.vue'
 import GuestEventFormModal from '@/components/event/GuestEventFormModal.vue'
 import GuestEventViewModal from '@/components/event/GuestEventViewModal.vue'
 import { apiConfig } from '@/config/api.js'
+import { buildApiUrl } from '@/utils/api'
 
 export default {
   name: 'GuestEventsPage',
@@ -149,7 +150,6 @@ export default {
       currentUserId: 1, // TODO: Get from auth store/session
       
       tableHeaders: [
-        { title: 'ID', key: 'id', sortable: true, width: '80px' },
         { title: 'Event Name', key: 'event_name', sortable: true },
         { title: 'Facility', key: 'facility', sortable: true },
         { title: 'Start Date/Time', key: 'start_datetime', sortable: true },
@@ -183,7 +183,7 @@ export default {
     async loadEvents() {
       this.loading = true
       try {
-        const response = await axios.get(`${this.apiBaseUrl}/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`)
+        const response = await axios.get(buildApiUrl(`/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`))
         this.events = response.data.data || []
       } catch (error) {
         console.error('Error loading events:', error)
@@ -202,7 +202,7 @@ export default {
 
       this.loading = true
       try {
-        const response = await axios.get(`${this.apiBaseUrl}/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`)
+        const response = await axios.get(buildApiUrl(`/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`))
         const allEvents = response.data.data || []
         
         // Filter events locally by search keywords
@@ -228,7 +228,7 @@ export default {
 
       this.loading = true
       try {
-        const response = await axios.get(`${this.apiBaseUrl}/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`)
+        const response = await axios.get(buildApiUrl(`/reservations/read_guest_reservations.php?user_id=${this.currentUserId}`))
         const allEvents = response.data.data || []
         
         // Filter events locally by facility
@@ -280,13 +280,18 @@ export default {
     async saveEvent(eventData) {
       this.loading = true
       try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+        
         if (this.isEditing) {
-          // Use the guest-specific update endpoint that only allows certain fields
-          await axios.put(`${this.apiBaseUrl}/reservations/update_guest_reservation.php`, eventData)
+          await axios.put(buildApiUrl(`/reservations/update_guest_reservation.php`), eventData, config)
           this.$toast?.success?.('Event updated successfully')
         } else {
-          // Use the guest-specific creation endpoint
-          await axios.post(`${this.apiBaseUrl}/reservations/create_guest_reservation.php`, eventData)
+          await axios.post(buildApiUrl(`/reservations/create_guest_reservation.php`), eventData, config)
           this.$toast?.success?.('Event request submitted successfully')
         }
         this.showFormModal = false

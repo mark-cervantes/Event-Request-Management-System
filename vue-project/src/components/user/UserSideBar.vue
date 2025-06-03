@@ -50,10 +50,10 @@ function logout() {
             <v-list-item prepend-icon="mdi-home-outline" title="Home" :to="{ name: 'UserHomepage' }" />
 
             <v-list-item prepend-icon="mdi-briefcase" title="Business Clearance"
-                :to="{ path: '/admin/business-clearance' }" />
+                :to="{ path: '/user/business-clearance' }" />
             <v-list-item prepend-icon="mdi-calendar" title="Event Scheduling"
-                :to="{ path: '/admin/event-scheduling' }" />
-            <v-list-item prepend-icon="mdi-message-alert" title="Complaints" :to="{ path: '/admin/complaints' }" />
+                :to="{ path: '/user/event-scheduling' }" />
+            <v-list-item prepend-icon="mdi-message-alert" title="Complaints" :to="{ path: '/user/complaint-form' }" />
         </v-list>
 
         <v-divider></v-divider>

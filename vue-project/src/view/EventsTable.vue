@@ -21,6 +21,7 @@
               prepend-inner-icon="mdi-magnify"
               variant="outlined"
               density="compact"
+              @input="searchReservations"
               clearable
             />
           </v-col>
@@ -32,6 +33,7 @@
               label="Filter by Status"
               variant="outlined"
               density="compact"
+              @update:model-value="filterByStatus"
               clearable
             />
           </v-col>
@@ -43,6 +45,7 @@
               label="Filter by Facility"
               variant="outlined"
               density="compact"
+              @update:model-value="filterByFacility"
               clearable
             />
           </v-col>
@@ -51,7 +54,7 @@
         <!-- Reusable Vuetify Table -->
         <DataTable
           :headers="tableHeaders"
-          :items="filteredEvents"
+          :items="events"
           :items-per-page="15"
           :external-search="searchKeywords"
           hide-search
@@ -79,29 +82,27 @@
           </template>
           
           <template #[`item.actions`]="{ item }">
-            <div class="d-flex">
-              <v-btn
-                icon="mdi-eye"
-                variant="text"
-                size="small"
-                color="info"
-                @click="viewEvent(item)"
-              />
-              <v-btn
-                icon="mdi-pencil"
-                variant="text"
-                size="small"
-                color="warning"
-                @click="editEvent(item)"
-              />
-              <v-btn
-                icon="mdi-delete"
-                variant="text"
-                size="small"
-                color="error"
-                @click="deleteEvent(item.id)"
-              />
-            </div>
+            <v-btn
+              icon="mdi-eye"
+              variant="text"
+              size="small"
+              color="info"
+              @click="viewEvent(item)"
+            />
+            <v-btn
+              icon="mdi-pencil"
+              variant="text"
+              size="small"
+              color="warning"
+              @click="editEvent(item)"
+            />
+            <v-btn
+              icon="mdi-delete"
+              variant="text"
+              size="small"
+              color="error"
+              @click="deleteEvent(item.id)"
+            />
           </template>
         </DataTable>
       </v-card-text>
@@ -157,7 +158,6 @@ import DataTable from '@/components/common/Table.vue'
 import EventFormModal from '@/components/event/EventFormModal.vue'
 import EventViewModal from '@/components/event/EventViewModal.vue'
 import { apiConfig } from '@/config/api.js'
-import { buildApiUrl } from '@/utils/api'
 
 export default {
   name: 'EventsTable',
@@ -169,7 +169,6 @@ export default {
   data() {
     return {
       events: [],
-      filteredEvents: [],
       loading: false,
       showFormModal: false,
       showViewModal: false,
@@ -184,6 +183,7 @@ export default {
       apiBaseUrl: apiConfig.baseURL,
       
       tableHeaders: [
+        { title: 'ID', key: 'id', sortable: true, width: '80px' },
         { title: 'Event Name', key: 'event_name', sortable: true },
         { title: 'Facility', key: 'facility', sortable: true },
         { title: 'Start Date/Time', key: 'start_datetime', sortable: true },
@@ -192,7 +192,7 @@ export default {
         { title: 'Requested By', key: 'requested_by', sortable: true },
         { title: 'Contact', key: 'contact_number', sortable: false },
         { title: 'Attendees', key: 'expected_attendees', sortable: true },
-        { title: 'Actions', key: 'actions', sortable: false, width: '160px' }
+        { title: 'Actions', key: 'actions', sortable: false, width: '120px' }
       ],
       
       statusFilterOptions: [
@@ -223,64 +223,69 @@ export default {
   mounted() {
     this.loadEvents()
   },
-  watch: {
-    searchKeywords: {
-      handler: 'applyFilters',
-      debounce: 300
-    },
-    statusFilter: 'applyFilters',
-    facilityFilter: 'applyFilters'
-  },
   methods: {
     async loadEvents() {
       this.loading = true
       try {
-        const response = await axios.get(buildApiUrl(`/reservations/readReservation.php`))
+        const response = await axios.get(`${this.apiBaseUrl}/readReservation.php`)
         this.events = response.data.data || []
-        this.applyFilters()
       } catch (error) {
         console.error('Error loading events:', error)
         this.events = []
-        this.filteredEvents = []
       } finally {
         this.loading = false
       }
     },
 
-    async applyFilters() {
+    async searchReservations() {
+      if (!this.searchKeywords?.trim()) {
+        this.loadEvents()
+        return
+      }
+
       this.loading = true
       try {
-        let filteredData = [...this.events]
-
-        // Apply search filter
-        if (this.searchKeywords?.trim()) {
-          const keywords = this.searchKeywords.toLowerCase().trim()
-          filteredData = filteredData.filter(event => 
-            event.event_name?.toLowerCase().includes(keywords) ||
-            event.facility?.toLowerCase().includes(keywords) ||
-            event.requested_by?.toLowerCase().includes(keywords) ||
-            event.purpose?.toLowerCase().includes(keywords)
-          )
-        }
-
-        // Apply status filter
-        if (this.statusFilter) {
-          filteredData = filteredData.filter(event => 
-            event.status === this.statusFilter
-          )
-        }
-
-        // Apply facility filter
-        if (this.facilityFilter) {
-          filteredData = filteredData.filter(event => 
-            event.facility === this.facilityFilter
-          )
-        }
-
-        this.filteredEvents = filteredData
+        const response = await axios.get(`${this.apiBaseUrl}/search_reservations.php?keywords=${encodeURIComponent(this.searchKeywords)}`)
+        this.events = response.data.data || []
       } catch (error) {
-        console.error('Error applying filters:', error)
-        this.filteredEvents = []
+        console.error('Error searching events:', error)
+        this.events = []
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async filterByStatus() {
+      if (!this.statusFilter) {
+        this.loadEvents()
+        return
+      }
+
+      this.loading = true
+      try {
+        const response = await axios.get(`${this.apiBaseUrl}/read_reservations_by_status.php?status=${this.statusFilter}`)
+        this.events = response.data.data || []
+      } catch (error) {
+        console.error('Error filtering by status:', error)
+        this.events = []
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async filterByFacility() {
+      if (!this.facilityFilter) {
+        this.loadEvents()
+        return
+      }
+
+      this.loading = true
+      try {
+        const response = await axios.get(`${this.apiBaseUrl}/read_reservations_by_facility.php?facility=${encodeURIComponent(this.facilityFilter)}`)
+        this.events = response.data.data || []
+      } catch (error) {
+        console.error('Error filtering by facility:', error)
+        this.events = []
       } finally {
         this.loading = false
       }
@@ -320,10 +325,10 @@ export default {
       this.loading = true
       try {
         if (this.isEditing) {
-          await axios.put(`${this.apiBaseUrl}/reservations/update_reservation.php`, eventData)
+          await axios.put(`${this.apiBaseUrl}/update_reservation.php`, eventData)
           this.$toast?.success?.('Event updated successfully')
         } else {
-          await axios.post(`${this.apiBaseUrl}/reservations/create_singleReservation.php`, eventData)
+          await axios.post(`${this.apiBaseUrl}/create_singleReservation.php`, eventData)
           this.$toast?.success?.('Event created successfully')
         }
         this.showFormModal = false
@@ -346,7 +351,7 @@ export default {
       this.showDeleteDialog = false
       this.loading = true
       try {
-        await axios.delete(`${this.apiBaseUrl}/reservations/delete_reservation.php`, {
+        await axios.delete(`${this.apiBaseUrl}/delete_reservation.php`, {
           data: { id: this.deleteEventId }
         })
         this.$toast?.success?.('Event deleted successfully')

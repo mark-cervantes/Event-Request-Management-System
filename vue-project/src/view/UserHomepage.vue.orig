@@ -36,13 +36,13 @@
                 <div class="text-white text-center mb-4">Quick and easy business permit processing for your enterprise
                 </div>
                 <v-btn color="yellow-darken-2" variant="outlined" class="text-white mb-8 font-weight-medium"
-                  style="background:rgba(255,255,255,0.12);" :to="{ path: '/user/business-clearance' }">Apply Now</v-btn>
+                  style="background:rgba(255,255,255,0.12);">Apply Now</v-btn>
               </v-card-text>
             </v-card>
           </v-col>
 
           <!-- Event Scheduling -->
-          <v-col cols="12" md="4" class="d-flex align-stretch">
+          <v-col cols="12" md="4"  class="d-flex align-stretch">
             <v-card class="service-card"
               :style="`background-image: linear-gradient(to bottom, rgba(30,64,175,0.4), rgba(30,64,175,0.8)), url('https://readdy.ai/api/search-image?query=community%20event%20planning%2C%20calendar%20and%20event%20organization%20tools%2C%20people%20planning%20events%20together%2C%20professional%20setting%20with%20blue%20tint&width=400&height=320&seq=2&orientation=landscape'); background-size: cover; background-position: center;`"
               elevation="8" rounded="xl">
@@ -54,7 +54,7 @@
                 <div class="text-h5 font-weight-bold text-white mb-2">Event Scheduling</div>
                 <div class="text-white text-center mb-4">Schedule and manage community events with ease</div>
                 <v-btn color="yellow-darken-2" variant="outlined" class="text-white mb-8 font-weight-medium"
-                  style="background:rgba(255,255,255,0.12);" :to="{ name: 'UserEventsForm' }">Book Now</v-btn>
+                  style="background:rgba(255,255,255,0.12);">Book Now</v-btn>
               </v-card-text>
             </v-card>
           </v-col>
@@ -72,10 +72,7 @@
                 <div class="text-h5 font-weight-bold text-white mb-2">Submit Complaints</div>
                 <div class="text-white text-center mb-4">Voice your concerns through our digital complaint system</div>
                 <v-btn color="yellow-darken-2" variant="outlined" class="text-white mb-8 font-weight-medium"
-                  style="background: rgba(255,255,255,0.12);" :to="{ name: 'ComplaintForm' }">
-                  File Now
-                </v-btn>
-
+                  style="background:rgba(255,255,255,0.12);">File Now</v-btn>
               </v-card-text>
             </v-card>
           </v-col>
