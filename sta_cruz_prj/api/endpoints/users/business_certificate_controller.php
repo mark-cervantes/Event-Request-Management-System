@@ -88,11 +88,14 @@ if ($method === 'POST') {
     
             if ($stmt->execute()) {
                 echo json_encode(['message' => 'Business certificate added']);
+                exit;
             } else {
                 echo json_encode(['message' => 'Failed to add business certificate']);
+                exit;
             }
         } else {
             echo json_encode(['message' => 'Incomplete data']);
+            exit;
         }
     }
     if ($action === 'edit' && isset($data['id'])) {

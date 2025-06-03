@@ -10,6 +10,8 @@ const allData = ref([]);
 const filteredData = ref([]);
 
 const dialog = ref(false);
+const receiptDialog = ref(false);
+const currentReceipt = ref('');
 const cardTitle = ref('Add Business Clearance');
 const isEditMode = ref(false);
 const userRole = ref('');
@@ -32,10 +34,9 @@ const formRef = ref(null);
 
 function setBusinessOwnerFromSession() {
   const sessionUser = JSON.parse(sessionStorage.getItem('user') || '{}');
-  if (sessionUser.role !== 'admin') {
-    Business_Owner.value = sessionUser.user_id  ;
-  }
+  Business_Owner.value = sessionUser.user_id || 1; // Default to 1 if no user_id
 }
+
 const headers = [
   { text: 'Business Name', value: 'business_name' },
   { text: 'Business Type', value: 'business_type' },
@@ -68,107 +69,65 @@ function addClicked() {
   setBusinessOwnerFromSession();
 }
 
-function handleFileUpload(file) {
-  // v-file-input emits an array if multiple, or a File if single
-  if (Array.isArray(file)) {
-    Certificate_Path.value = file[0] || null;
-  } else if (file && file.target && file.target.files) {
-    Certificate_Path.value = file.target.files[0] || null;
-  } else {
-    Certificate_Path.value = file;
-  }
-}
-
-// Helper to upload file and get path
-async function uploadCertificateFile(file, action, payload) {
-  if (!file) return '';
-  try {
-    const formData = new FormData();
-    formData.append('path', file);
-    formData.append('action', action);
-    // Append all payload fields for add/edit
-    Object.keys(payload).forEach(key => {
-      if (payload[key] !== undefined && key !== 'path') {
-        formData.append(key, payload[key]);
-      }
-    });
-
-    const baseURL = import.meta.env.VITE_API_URL;
-    const response = await axios.post(
-      baseURL + '/users/business_certificate_controller.php',
-      formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    );
-    if (response.data && response.data.path) {
-      return response.data.path;
-    }
-    // If backend returns message only, treat as error
-    if (response.data && response.data.message) {
-      alert(response.data.message);
-    }
-    return '';
-  } catch (error) {
-    console.error('File upload failed:', error);
-    return '';
-  }
-}
-
 async function addCertificate() {
   const valid = await formRef.value?.validate();
   if (!valid) return;
 
-  setBusinessOwnerFromSession();
-
   try {
-    const baseURL = import.meta.env.VITE_API_URL;
-    const url = baseURL + '/users/business_certificate_controller.php';
-    // Prepare payload for add/edit
+    const url = buildApiUrl('/users/business_certificate_controller.php');
     const payload = {
       action: isEditMode.value ? 'edit' : 'add',
       id: Business_Certificate_ID.value,
       business_name: Business_Name.value,
       business_type: Business_Type.value,
       business_address: Business_Address.value,
-      business_owner: Business_Owner.value,
+      business_owner: 1, // Simplified: just use 1 as default owner
       date_registered: Date_Registered.value,
       issued_date: Issued_Date.value,
       expiry_date: Expiry_Date.value,
-      status: Status.value
+      status: Status.value === 'Approved' ? 1 : 0
     };
 
-    let filePath = '';
     if (Certificate_Path.value) {
-      // Upload file and all fields together (backend expects action in POST)
-      filePath = await uploadCertificateFile(Certificate_Path.value, payload.action, payload);
-      if (!filePath) {
-        // If backend returns error, stop
-        return;
+      const formData = new FormData();
+      formData.append('path', Certificate_Path.value);
+      
+      // Append all payload fields
+      Object.keys(payload).forEach(key => {
+        formData.append(key, payload[key]);
+      });
+
+      console.log('Submitting form data:', Object.fromEntries(formData)); // Debug log
+
+      const response = await axios.post(url, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (response.data && response.data.message) {
+        alert(response.data.message);
+        dialog.value = false;
+        await fetchbusinesslist(); // Refresh the data instead of reloading page
       }
-      payload.path = filePath;
-    } else if (isEditMode.value) {
-      // If editing and no new file, don't send path
-      // (backend will not update path)
     } else {
-      // If adding and no file, error
-      alert('Certificate file is required.');
+      alert('Please upload a payment receipt');
       return;
     }
-
-    // If file was uploaded, backend already handled add/edit, so skip extra POST
-    if (Certificate_Path.value) {
-      dialog.value = false;
-      window.location.reload();
-      return;
-    }
-
-    // If no file, send JSON payload for add/edit
-    const response = await axios.post(url, payload);
-    alert(response.data.message);
-    dialog.value = false;
-    window.location.reload();
   } catch (error) {
-    console.error(error);
+    console.error('Error submitting form:', error);
+    alert('Error submitting form. Please try again.');
   }
+}
+
+function handleFileUpload(file) {
+  console.log('File upload event:', file); // Debug log
+  
+  if (!file) {
+    Certificate_Path.value = null;
+    return;
+  }
+
+  // v-file-input emits the file directly
+  Certificate_Path.value = file;
 }
 
 async function editClicked(id) {
@@ -204,10 +163,9 @@ async function deleteClicked(id) {
       const payload = { action: 'delete', id };
       const response = await axios.post(url, payload);
       alert(response.data.message);
+      await fetchbusinesslist(); // Refresh the data instead of reloading page
     } catch (error) {
       console.error(error);
-    } finally {
-      window.location.reload();
     }
   }
 }
@@ -250,11 +208,18 @@ function filterTable() {
 
 watch([allData, search], filterTable);
 
+function viewReceipt(path) {
+  if (path && path.trim() !== '') {
+    // Ensure the path is properly formatted
+    const fullPath = path.startsWith('http') ? path : apiUrl + 'api/endpoints/' + path;
+    currentReceipt.value = fullPath;
+    receiptDialog.value = true;
+  }
+}
+
 onMounted(() => {
   fetchbusinesslist();
   clearFields();
-  setBusinessOwnerFromSession();
-
   const sessionUser = JSON.parse(sessionStorage.getItem('user') || '{}');
   userRole.value = sessionUser?.role || '';
 });
@@ -319,10 +284,10 @@ onMounted(() => {
         />
         <v-file-input
           v-model="Certificate_Path"
-          label="Upload Payment "
-          
+          label="Upload Payment"
           prepend-icon="mdi-upload"
           show-size
+          accept="image/*"
           @change="handleFileUpload"
           :disabled="false"
         />
@@ -333,6 +298,7 @@ onMounted(() => {
     label="Upload Payment"
     prepend-icon="mdi-upload"
     show-size
+    accept="image/*"
     @change="handleFileUpload"
   />
   <!-- Show payment instruction below the file input -->
@@ -419,13 +385,15 @@ onMounted(() => {
         </v-chip>
         </td>
         <td>
-            <a
-          v-if="row.path && row.path.trim() !== ''"
-          :href="apiUrl + 'api/endpoints/'+row.path"
-          target="_blank"
-          style="text-decoration: none;"
-        >View</a>
-        <span v-else>-</span>
+            <v-btn
+              v-if="row.path && row.path.trim() !== ''"
+              text
+              color="primary"
+              @click="viewReceipt(row.path)"
+            >
+              View
+            </v-btn>
+            <span v-else>-</span>
         </td>
         <td>
         <v-btn
@@ -446,4 +414,32 @@ onMounted(() => {
     </v-tab-item>
   </v-tabs-items>
   </v-container>
+
+  <!-- Add Receipt Viewer Dialog -->
+  <v-dialog v-model="receiptDialog" max-width="800">
+    <v-card>
+      <v-card-title class="text-h5">
+        Payment Receipt
+        <v-spacer></v-spacer>
+        <v-btn icon @click="receiptDialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+      <v-card-text>
+        <v-img
+          v-if="currentReceipt"
+          :src="currentReceipt"
+          max-height="600"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular indeterminate color="grey lighten-1"></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
