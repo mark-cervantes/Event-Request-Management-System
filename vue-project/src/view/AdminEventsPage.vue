@@ -21,7 +21,6 @@
               prepend-inner-icon="mdi-magnify"
               variant="outlined"
               density="compact"
-              @input="searchReservations"
               clearable
             />
           </v-col>
@@ -33,7 +32,6 @@
               label="Filter by Status"
               variant="outlined"
               density="compact"
-              @update:model-value="filterByStatus"
               clearable
             />
           </v-col>
@@ -45,7 +43,6 @@
               label="Filter by Facility"
               variant="outlined"
               density="compact"
-              @update:model-value="filterByFacility"
               clearable
             />
           </v-col>
@@ -54,7 +51,7 @@
         <!-- Reusable Vuetify Table -->
         <DataTable
           :headers="tableHeaders"
-          :items="events"
+          :items="filteredEvents"
           :items-per-page="15"
           :external-search="searchKeywords"
           hide-search
@@ -172,6 +169,7 @@ export default {
   data() {
     return {
       events: [],
+      filteredEvents: [],
       loading: false,
       showFormModal: false,
       showViewModal: false,
@@ -225,69 +223,64 @@ export default {
   mounted() {
     this.loadEvents()
   },
+  watch: {
+    searchKeywords: {
+      handler: 'applyFilters',
+      debounce: 300
+    },
+    statusFilter: 'applyFilters',
+    facilityFilter: 'applyFilters'
+  },
   methods: {
     async loadEvents() {
       this.loading = true
       try {
         const response = await axios.get(buildApiUrl(`/reservations/readReservation.php`))
         this.events = response.data.data || []
+        this.applyFilters()
       } catch (error) {
         console.error('Error loading events:', error)
         this.events = []
+        this.filteredEvents = []
       } finally {
         this.loading = false
       }
     },
 
-    async searchReservations() {
-      if (!this.searchKeywords?.trim()) {
-        this.loadEvents()
-        return
-      }
-
+    async applyFilters() {
       this.loading = true
       try {
-        const response = await axios.get(buildApiUrl(`/reservations/search_reservations.php?keywords=${encodeURIComponent(this.searchKeywords)}`))
-        this.events = response.data.data || []
+        let filteredData = [...this.events]
+
+        // Apply search filter
+        if (this.searchKeywords?.trim()) {
+          const keywords = this.searchKeywords.toLowerCase().trim()
+          filteredData = filteredData.filter(event => 
+            event.event_name?.toLowerCase().includes(keywords) ||
+            event.facility?.toLowerCase().includes(keywords) ||
+            event.requested_by?.toLowerCase().includes(keywords) ||
+            event.purpose?.toLowerCase().includes(keywords)
+          )
+        }
+
+        // Apply status filter
+        if (this.statusFilter) {
+          filteredData = filteredData.filter(event => 
+            event.status === this.statusFilter
+          )
+        }
+
+        // Apply facility filter
+        if (this.facilityFilter) {
+          filteredData = filteredData.filter(event => 
+            event.facility === this.facilityFilter
+          )
+        }
+
+        this.filteredEvents = filteredData
       } catch (error) {
-        console.error('Error searching events:', error)
-        this.events = []
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async filterByStatus() {
-      if (!this.statusFilter) {
-        this.loadEvents()
-        return
-      }
-
-      this.loading = true
-      try {
-        const response = await axios.get(buildApiUrl(`/reservations/read_reservations_by_status.php?status=${this.statusFilter}`))
-        this.events = response.data.data || []
-      } catch (error) {
-        console.error('Error filtering by status:', error)
-        this.events = []
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async filterByFacility() {
-      if (!this.facilityFilter) {
-        this.loadEvents()
-        return
-      }
-
-      this.loading = true
-      try {
-        const response = await axios.get(buildApiUrl(`/reservations/read_reservations_by_facility.php?facility=${encodeURIComponent(this.facilityFilter)}`))
-        this.events = response.data.data || []
-      } catch (error) {
-        console.error('Error filtering by facility:', error)
-        this.events = []
+        console.error('Error applying filters:', error)
+        this.filteredEvents = []
       } finally {
         this.loading = false
       }
