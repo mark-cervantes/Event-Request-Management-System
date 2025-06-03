@@ -281,13 +281,18 @@ export default {
     async saveEvent(eventData) {
       this.loading = true
       try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+        
         if (this.isEditing) {
-          // Use the guest-specific update endpoint that only allows certain fields
-          await axios.put(buildApiUrl(`/reservations/update_guest_reservation.php`, eventData))
+          await axios.put(buildApiUrl(`/reservations/update_guest_reservation.php`), eventData, config)
           this.$toast?.success?.('Event updated successfully')
         } else {
-          // Use the guest-specific creation endpoint
-          await axios.post(buildApiUrl(`/reservations/create_guest_reservation.php`, eventData))
+          await axios.post(buildApiUrl(`/reservations/create_guest_reservation.php`), eventData, config)
           this.$toast?.success?.('Event request submitted successfully')
         }
         this.showFormModal = false
