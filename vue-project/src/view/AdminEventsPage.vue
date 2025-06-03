@@ -82,27 +82,29 @@
           </template>
           
           <template #[`item.actions`]="{ item }">
-            <v-btn
-              icon="mdi-eye"
-              variant="text"
-              size="small"
-              color="info"
-              @click="viewEvent(item)"
-            />
-            <v-btn
-              icon="mdi-pencil"
-              variant="text"
-              size="small"
-              color="warning"
-              @click="editEvent(item)"
-            />
-            <v-btn
-              icon="mdi-delete"
-              variant="text"
-              size="small"
-              color="error"
-              @click="deleteEvent(item.id)"
-            />
+            <div class="d-flex">
+              <v-btn
+                icon="mdi-eye"
+                variant="text"
+                size="small"
+                color="info"
+                @click="viewEvent(item)"
+              />
+              <v-btn
+                icon="mdi-pencil"
+                variant="text"
+                size="small"
+                color="warning"
+                @click="editEvent(item)"
+              />
+              <v-btn
+                icon="mdi-delete"
+                variant="text"
+                size="small"
+                color="error"
+                @click="deleteEvent(item.id)"
+              />
+            </div>
           </template>
         </DataTable>
       </v-card-text>
@@ -184,7 +186,6 @@ export default {
       apiBaseUrl: apiConfig.baseURL,
       
       tableHeaders: [
-        { title: 'ID', key: 'id', sortable: true, width: '80px' },
         { title: 'Event Name', key: 'event_name', sortable: true },
         { title: 'Facility', key: 'facility', sortable: true },
         { title: 'Start Date/Time', key: 'start_datetime', sortable: true },
@@ -193,7 +194,7 @@ export default {
         { title: 'Requested By', key: 'requested_by', sortable: true },
         { title: 'Contact', key: 'contact_number', sortable: false },
         { title: 'Attendees', key: 'expected_attendees', sortable: true },
-        { title: 'Actions', key: 'actions', sortable: false, width: '120px' }
+        { title: 'Actions', key: 'actions', sortable: false, width: '160px' }
       ],
       
       statusFilterOptions: [
