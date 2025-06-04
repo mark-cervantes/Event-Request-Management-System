@@ -87,11 +87,10 @@ class ComplaintForm
         $this->complainant_fullname = htmlspecialchars(strip_tags($this->complainant_fullname));
         $this->complainant_address = htmlspecialchars(strip_tags($this->complainant_address));
         $this->complainant_cellphone = htmlspecialchars(strip_tags($this->complainant_cellphone));
-        $this->respondent_fullname = htmlspecialchars(strip_tags($this->respondent_fullname));
-        $this->respondent_address = htmlspecialchars(strip_tags($this->respondent_address));
+        $this->respondent_fullname = htmlspecialchars(strip_tags($this->respondent_fullname));        $this->respondent_address = htmlspecialchars(strip_tags($this->respondent_address));
         $this->respondent_cellphone = htmlspecialchars(strip_tags($this->respondent_cellphone));
         $this->complaint_description = htmlspecialchars(strip_tags($this->complaint_description));
-        $this->attachment_file = htmlspecialchars(strip_tags($this->attachment_file));
+        $this->attachment_file = $this->attachment_file ? htmlspecialchars(strip_tags($this->attachment_file)) : null;
         $this->date_of_incident = htmlspecialchars(strip_tags($this->date_of_incident));
 
         // Bind data

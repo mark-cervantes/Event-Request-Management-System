@@ -12,6 +12,7 @@ import RecordComplaint from '@/view/RecordComplaint.vue'
 import ComplaintForm from '@/view/ComplaintForm.vue'
 import EventsTable from '@/view/EventsTable.vue'
 import GuestEventsPage from '@/view/GuestEventsPage.vue'
+import GuestComplaintPage from '@/view/GuestComplaintPage.vue'
 import UserEventsPage from '@/view/user/UserEventsPage.vue'
 import BusinessClearance from '@/view/BusinessClearance.vue'
 // Layouts
@@ -55,7 +56,8 @@ const routes = [
     component: GuestLayout,
     children: [
       { path: 'guest-homepage', name: 'GuestHomepage', component: GuestHomepage },
-      { path: 'events', name: 'GuestEventsPage', component: GuestEventsPage }
+      { path: 'events', name: 'GuestEventsPage', component: GuestEventsPage },
+      { path: 'complaints', name: 'GuestComplaintPage', component: GuestComplaintPage }
     ]
   },
 

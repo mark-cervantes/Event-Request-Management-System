@@ -55,7 +55,7 @@
                 <div class="text-h5 font-weight-bold text-white mb-2">Submit Complaints</div>
                 <div class="text-white text-center mb-4">Voice your concerns through our digital complaint system</div>
                 <v-btn color="yellow-darken-2" variant="outlined" class="text-white mb-8 font-weight-medium"
-                  style="background:rgba(255,255,255,0.12);">File Now</v-btn>
+                  style="background:rgba(255,255,255,0.12);" :to="{ path: '/guest/complaints' }">File Now</v-btn>
               </v-card-text>
             </v-card>
           </v-col>
