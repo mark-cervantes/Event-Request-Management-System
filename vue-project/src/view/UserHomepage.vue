@@ -26,7 +26,8 @@
           <v-col cols="12" md="4" class="d-flex align-stretch">
             <v-card class="service-card"
               :style="`background-image: linear-gradient(to bottom, rgba(30,64,175,0.4), rgba(30,64,175,0.8)), url('https://readdy.ai/api/search-image?query=community%20event%20planning%2C%20calendar%20and%20event%20organization%20tools%2C%20people%20planning%20events%20together%2C%20professional%20setting%20with%20blue%20tint&width=400&height=320&seq=2&orientation=landscape'); background-size: cover; background-position: center;`"
-              elevation="8" rounded="xl">
+      
+        elevation="8" rounded="xl">
               <v-card-text class="d-flex flex-column align-center justify-center h-100 service-card-content">
                 <div class="d-flex align-center justify-center mb-4"
                   style="background:rgba(255,255,255,0.15); border-radius:50%; width:80px; height:80px;">

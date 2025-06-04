@@ -27,8 +27,8 @@ if (
     !empty($data->requested_by)
 ) {
     // Set reservation properties
-    $reservation->user_id = $data->user_id ?? null;
-    $reservation->official_id = $data->official_id ?? null;
+    $reservation->user_id = (!empty($data->user_id) && $data->user_id !== '') ? (int)$data->user_id : null;
+    $reservation->official_id = (!empty($data->official_id) && $data->official_id !== '') ? (int)$data->official_id : null;
     $reservation->facility = $data->facility;
     $reservation->event_name = $data->event_name;
     $reservation->start_datetime = $data->start_datetime;
@@ -37,7 +37,7 @@ if (
     $reservation->requested_by = $data->requested_by;
     $reservation->contact_number = $data->contact_number ?? null;
     $reservation->purpose = $data->purpose ?? null;
-    $reservation->expected_attendees = $data->expected_attendees ?? 0;
+    $reservation->expected_attendees = (!empty($data->expected_attendees) && $data->expected_attendees !== '') ? (int)$data->expected_attendees : 0;
 
     // Check for scheduling conflicts
     if ($reservation->checkConflict()) {

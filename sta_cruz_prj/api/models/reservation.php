@@ -95,17 +95,17 @@ class Reservation {
         $stmt = $this->conn->prepare($query);
 
         // Clean data
-        $this->user_id = $this->user_id ? htmlspecialchars(strip_tags($this->user_id)) : null;
-        $this->official_id = $this->official_id ? htmlspecialchars(strip_tags($this->official_id)) : null;
-        $this->facility = htmlspecialchars(strip_tags($this->facility));
-        $this->event_name = htmlspecialchars(strip_tags($this->event_name));
-        $this->start_datetime = htmlspecialchars(strip_tags($this->start_datetime));
-        $this->end_datetime = htmlspecialchars(strip_tags($this->end_datetime));
-        $this->status = htmlspecialchars(strip_tags($this->status));
-        $this->requested_by = htmlspecialchars(strip_tags($this->requested_by));
-        $this->contact_number = htmlspecialchars(strip_tags($this->contact_number));
-        $this->purpose = htmlspecialchars(strip_tags($this->purpose));
-        $this->expected_attendees = htmlspecialchars(strip_tags($this->expected_attendees));
+        $this->user_id = $this->user_id ? (int)htmlspecialchars(strip_tags($this->user_id)) : null;
+        $this->official_id = $this->official_id ? (int)htmlspecialchars(strip_tags($this->official_id)) : null;
+        $this->facility = $this->facility ? htmlspecialchars(strip_tags($this->facility)) : null;
+        $this->event_name = $this->event_name ? htmlspecialchars(strip_tags($this->event_name)) : null;
+        $this->start_datetime = $this->start_datetime ? htmlspecialchars(strip_tags($this->start_datetime)) : null;
+        $this->end_datetime = $this->end_datetime ? htmlspecialchars(strip_tags($this->end_datetime)) : null;
+        $this->status = $this->status ? htmlspecialchars(strip_tags($this->status)) : 'Pending';
+        $this->requested_by = $this->requested_by ? htmlspecialchars(strip_tags($this->requested_by)) : null;
+        $this->contact_number = $this->contact_number ? htmlspecialchars(strip_tags($this->contact_number)) : null;
+        $this->purpose = $this->purpose ? htmlspecialchars(strip_tags($this->purpose)) : null;
+        $this->expected_attendees = $this->expected_attendees ? (int)htmlspecialchars(strip_tags($this->expected_attendees)) : 0;
 
         // Bind data
         $stmt->bindParam(':user_id', $this->user_id);
@@ -147,18 +147,18 @@ class Reservation {
         $stmt = $this->conn->prepare($query);
 
         // Clean data
-        $this->user_id = htmlspecialchars(strip_tags($this->user_id));
-        $this->official_id = htmlspecialchars(strip_tags($this->official_id));
-        $this->facility = htmlspecialchars(strip_tags($this->facility));
-        $this->event_name = htmlspecialchars(strip_tags($this->event_name));
-        $this->start_datetime = htmlspecialchars(strip_tags($this->start_datetime));
-        $this->end_datetime = htmlspecialchars(strip_tags($this->end_datetime));
-        $this->status = htmlspecialchars(strip_tags($this->status));
-        $this->requested_by = htmlspecialchars(strip_tags($this->requested_by));
-        $this->contact_number = htmlspecialchars(strip_tags($this->contact_number));
-        $this->purpose = htmlspecialchars(strip_tags($this->purpose));
-        $this->expected_attendees = htmlspecialchars(strip_tags($this->expected_attendees));
-        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->user_id = $this->user_id ? (int)htmlspecialchars(strip_tags($this->user_id)) : null;
+        $this->official_id = $this->official_id ? (int)htmlspecialchars(strip_tags($this->official_id)) : null;
+        $this->facility = $this->facility ? htmlspecialchars(strip_tags($this->facility)) : null;
+        $this->event_name = $this->event_name ? htmlspecialchars(strip_tags($this->event_name)) : null;
+        $this->start_datetime = $this->start_datetime ? htmlspecialchars(strip_tags($this->start_datetime)) : null;
+        $this->end_datetime = $this->end_datetime ? htmlspecialchars(strip_tags($this->end_datetime)) : null;
+        $this->status = $this->status ? htmlspecialchars(strip_tags($this->status)) : null;
+        $this->requested_by = $this->requested_by ? htmlspecialchars(strip_tags($this->requested_by)) : null;
+        $this->contact_number = $this->contact_number ? htmlspecialchars(strip_tags($this->contact_number)) : null;
+        $this->purpose = $this->purpose ? htmlspecialchars(strip_tags($this->purpose)) : null;
+        $this->expected_attendees = $this->expected_attendees ? (int)htmlspecialchars(strip_tags($this->expected_attendees)) : 0;
+        $this->id = $this->id ? (int)htmlspecialchars(strip_tags($this->id)) : null;
 
         // Bind data
         $stmt->bindParam(':user_id', $this->user_id);
