@@ -37,7 +37,7 @@
                 <div class="text-h5 font-weight-bold text-white mb-2">Event Scheduling</div>
                 <div class="text-white text-center mb-4">Schedule and manage community events with ease</div>
                 <v-btn color="yellow-darken-2" variant="outlined" class="text-white mb-8 font-weight-medium"
-                  style="background:rgba(255,255,255,0.12);">Book Now</v-btn>
+                  style="background:rgba(255,255,255,0.12);" :to="{ path: '/guest/events' }">Book Now</v-btn>
               </v-card-text>
             </v-card>
           </v-col>
