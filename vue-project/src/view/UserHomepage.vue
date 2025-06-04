@@ -22,25 +22,6 @@
 
         <!-- Service Cards -->
         <v-row justify="center" class="mt-6">
-          <!-- Business Clearance -->
-          <v-col cols="12" md="4" class="d-flex align-stretch">
-            <v-card class="service-card"
-              :style="`background-image: linear-gradient(to bottom, rgba(30,64,175,0.4), rgba(30,64,175,0.8)), url('https://readdy.ai/api/search-image?query=business%20office%20with%20documents%20and%20stamps%2C%20professional%20setting%2C%20business%20permit%20processing%2C%20clean%20modern%20office%20environment%2C%20blue%20tint&width=400&height=320&seq=1&orientation=landscape'); background-size: cover; background-position: center;`"
-              elevation="8" rounded="xl">
-              <v-card-text class="d-flex flex-column align-center justify-center h-100 service-card-content">
-                <div class="d-flex align-center justify-center mb-4"
-                  style="background:rgba(255,255,255,0.15); border-radius:50%; width:80px; height:80px;">
-                  <v-icon color="white" size="48">mdi-briefcase-outline</v-icon>
-                </div>
-                <div class="text-h5 font-weight-bold text-white mb-2">Business Clearance</div>
-                <div class="text-white text-center mb-4">Quick and easy business permit processing for your enterprise
-                </div>
-                <v-btn color="yellow-darken-2" variant="outlined" class="text-white mb-8 font-weight-medium"
-                  style="background:rgba(255,255,255,0.12);" :to="{ path: '/user/business-clearance' }">Apply Now</v-btn>
-              </v-card-text>
-            </v-card>
-          </v-col>
-
           <!-- Event Scheduling -->
           <v-col cols="12" md="4" class="d-flex align-stretch">
             <v-card class="service-card"
